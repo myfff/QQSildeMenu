@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initUi();
         initData();
-        System.out.print("你好付芳芳");
+        System.out.print("你好付芳1");
         qqDraglayout.setMenuChangedStateLister(new QQDraglayout.MenuViewChangedStateLister() {
             @Override
             public void open() {
