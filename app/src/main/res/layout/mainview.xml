@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.example.administrator.qqsildemenu.MyLinearlayut xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/myll"
+    android:background="#ffffff">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#18B4ED" >
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_marginLeft="15dp"
+            android:id="@+id/iv_main"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/head" />
+    </RelativeLayout>
+
+    <ListView android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/main_lv"
+        android:listSelector="@android:color/transparent"></ListView>
+</com.example.administrator.qqsildemenu.MyLinearlayut>
