@@ -105,8 +105,4 @@ public class MainActivity extends AppCompatActivity {
         qqDraglayout= (QQDraglayout) findViewById(R.id.activity_main);
         myLinearlayut=(MyLinearlayut)findViewById(R.id.myll);
     }
-
-    //设置当前主界面的监听
-
-
 }
