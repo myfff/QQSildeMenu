@@ -21,13 +21,11 @@ import com.nineoldandroids.view.ViewPropertyAnimator;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-    private ListView lvMain, lvMenu;
-    private ImageView imagemenu,imagemain;
-    private QQDraglayout qqDraglayout;
-    private  MyLinearlayut myLinearlayut;
+    private ListView lvMain, lvMenu; //两个view中的ListView
+    private ImageView imagemenu,imagemain; //两个view中的ImageView
+    private QQDraglayout qqDraglayout;//容器布局
+    private  MyLinearlayut myLinearlayut;  //mainview的布局
     private static final String TAG = "MainActivity";
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initUi();
         initData();
-        System.out.print("你好付芳33");
+        //设置全局的监听，当打开侧边栏和关闭侧边栏我们回调的方法需要具体处理什么逻辑
         qqDraglayout.setMenuChangedStateLister(new QQDraglayout.MenuViewChangedStateLister() {
             @Override
             public void open() {
@@ -48,20 +46,21 @@ public class MainActivity extends AppCompatActivity {
             public void close() {
                 //让main的image滑动
                 Log.e("tag", "onClose");
+                //让mainview中的imageView做属性动画
                 ViewPropertyAnimator.animate(imagemain).translationXBy(15)
                         .setInterpolator(new CycleInterpolator(4))
                         .setDuration(500)
                         .start();
             }
 
+            //滑动的时候做mainview中imageview图片的透明动画
             @Override
             public void onDraging(float fraction) {
                 Log.e("tag", "onDraging fraction:"+fraction);
                 ViewHelper.setAlpha(imagemain,1-fraction);
-
             }
         });
-        myLinearlayut.setSlideMenu(qqDraglayout);//j将侧边栏传给main，让main根据其变化   让main不响应事件
+        myLinearlayut.setSlideMenu(qqDraglayout);//将主容器传给mainview，让main根据其变化   让main不响应事件
     }
 
     private void initData() {

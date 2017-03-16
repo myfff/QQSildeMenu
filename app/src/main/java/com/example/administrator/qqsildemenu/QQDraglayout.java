@@ -16,9 +16,10 @@ import com.example.administrator.qqsildemenu.Test.DragLayout;
 import com.nineoldandroids.animation.FloatEvaluator;
 import com.nineoldandroids.animation.IntEvaluator;
 import com.nineoldandroids.view.ViewHelper;
-/*在此里面我们只关注两个view的拖拽动画，并不关心实际的view里面的空控件的动画，如果要根据一个view的状态来改变另一个view里面的动画，我们需要用回调*/
-
+/*在此里面我们只关注两个view的拖拽动画，并不关心实际的view里面的控件的动画，
+如果要根据一个view的状态来改变另一个view里面的动画，我们需要用到回调机制*/
 /*侧边栏开关*/
+
 /**
  * Created by Administrator on 2017/3/13.
  */
@@ -29,7 +30,6 @@ public class QQDraglayout extends FrameLayout {
     private View mainview;
     private float range;//拖拽的范围
     private float width;
-
 
 
     private FloatEvaluator floatEvaluator;//float的计算器      //执行计算
@@ -52,29 +52,30 @@ public class QQDraglayout extends FrameLayout {
     }
 
     /**
-     * 获取当前的状态
+     * 获取当前的侧边栏的状态
+     *
      * @return
      */
-    public DragState getCurrentState(){
+    public DragState getCurrentState() {
         return currentState;
     }
 
     /**
-     * 此方法会在加载完xml文件后执行
+     * 此方法会在加载完xml文件后执行，便了得知有几个子view
      */
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        //当布局加载多于2个child，我们要进行一场处理
+        //限定只能加载另个子view，否则会报异常
         if (getChildCount() != 2) {
-            throw new IllegalArgumentException("此方法只能加载两个子控件");
+            throw new IllegalArgumentException("此方法只能加载两个子view");
         }
         menuview = getChildAt(0);
         mainview = getChildAt(1);
     }
 
     /**
-     * 执行完onmeasu后执行此方法
+     * 执行完onmersure（）后执行此方法
      * 在次里面可以测量自己和子view的宽高
      *
      * @param w
@@ -87,7 +88,6 @@ public class QQDraglayout extends FrameLayout {
         super.onSizeChanged(w, h, oldw, oldh);
         width = getMeasuredWidth();
         range = (float) (width * 0.6);
-
     }
 
     private void init() {
@@ -96,23 +96,36 @@ public class QQDraglayout extends FrameLayout {
         intEvaluator = new IntEvaluator();
     }
 
-   public   MenuViewChangedStateLister lister;
-    interface  MenuViewChangedStateLister{
+    public MenuViewChangedStateLister lister;
+
+    //[1]
+    interface MenuViewChangedStateLister {
         void open();
+
         void close();
+
         void onDraging(float fraction);
     }
-    public void setMenuChangedStateLister(MenuViewChangedStateLister lister){
-        this.lister=lister;
+
+    /**
+     * [2]
+     * 给外界提供一个设置监听的接口
+     *
+     * @param lister
+     */
+    public void setMenuChangedStateLister(MenuViewChangedStateLister lister) {
+        this.lister = lister;
     }
-   // /定义状态常量
-    enum DragState{
-        Open,Close;
+
+    // 通过枚举定义状态常量
+    enum DragState {
+        Open, Close;
     }
+
     private DragState currentState = DragState.Close;//当前SlideMenu的状态默认是关闭的
 
 
-
+    //重写ViewDragHelper.Callback的回调方法，对触摸事件进行相应的解析及执行
     private ViewDragHelper.Callback callback = new ViewDragHelper.Callback() {
         @Override
         public boolean tryCaptureView(View child, int pointerId) {
@@ -176,22 +189,25 @@ public class QQDraglayout extends FrameLayout {
             //得到一个fraction执行伴随动画
             float fraction = mainview.getLeft() / range;//计算滑动的百分比
             execuanim(fraction);
-            if(fraction==0 && currentState!=DragState.Close){
+
+            //[3]在适当的时候调用
+            if (fraction == 0 && currentState != DragState.Close) {
                 //为0状态不为关，我们要关闭，更改状态，且回调
-                currentState=DragState.Close;
+                currentState = DragState.Close;
                 lister.close();
             }
-            if(fraction==1 && currentState!=DragState.Open){
-                currentState=DragState.Open;
+            if (fraction == 1 && currentState != DragState.Open) {
+                currentState = DragState.Open;
                 lister.open();
-            }if(lister!=null ){
+            }
+            if (lister != null) {
                 lister.onDraging(fraction);
             }
 
         }
 
 
-        /**手指抬起时应在哪个部分
+        /**手指抬起做main的滑动方向
          * @param releasedChild
          * @param xvel
          * @param yvel
@@ -201,24 +217,20 @@ public class QQDraglayout extends FrameLayout {
             super.onViewReleased(releasedChild, xvel, yvel);
             float center = range / 2;
             if (center > mainview.getLeft()) {
-
                 //  mainview.layout(0,mainview.getTop(),mainview.getRight(),mainview.getBottom());
-                  close();//关闭菜单栏
+                close();//关闭菜单栏
             } else {
-
                 // mainview.layout((int) range,mainview.getTop(),mainview.getRight(),mainview.getBottom());
                 open();
             }
-
             //处理用户的稍微滑动
-            if(xvel>300 && currentState!=DragState.Open){
+            if (xvel > 300 && currentState != DragState.Open) {
                 open();
-            }else if (xvel<-300 && currentState!=DragState.Close) {
+            } else if (xvel < -300 && currentState != DragState.Close) {
                 close();
             }
         }
     };
-
 
     /**
      * ViewDragHelper里面封装了Scoller
@@ -248,12 +260,12 @@ public class QQDraglayout extends FrameLayout {
 
 
     /**
-     * 根据fraction执行伴随
+     * 根据fraction执行伴随动画
      *
      * @param fraction
      */
     private void execuanim(float fraction) {
-        //mainview缩放的大小
+        //mainview缩放的大小     此处通过一个类 FloatEvaluator  IntEvaluato完成了缩放，移动，透明度随着滑动比例的变化
         ViewHelper.setScaleX(mainview, floatEvaluator.evaluate(fraction, 1.0f, 0.8f));
         ViewHelper.setScaleY(mainview, floatEvaluator.evaluate(fraction, 1.0f, 0.8f));
 
@@ -265,6 +277,7 @@ public class QQDraglayout extends FrameLayout {
         ViewHelper.setScaleY(menuview, floatEvaluator.evaluate(fraction, 0.5f, 1.0f));
         //设置menuview的透明度
         ViewHelper.setAlpha(menuview, floatEvaluator.evaluate(fraction, (int) 0.1f, (int) 1.0f));
+
 
         //还有QQDraglayout的背景变化
         //给SlideMenu的背景添加黑色的遮罩效果
